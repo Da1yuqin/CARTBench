@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 460" role="img" aria-label="Illustration of a hospital bag, two packing pouches, and personal care essentials">
+<defs><pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse"><path d="M36 0H0V36" fill="none" stroke="#cfddd8" stroke-width=".8"/></pattern><linearGradient id="bag" x2="0" y2="1"><stop stop-color="#839c8d"/><stop offset="1" stop-color="#5f7e6e"/></linearGradient></defs>
+<rect width="620" height="460" rx="36" fill="#eaf0e9"/><rect width="620" height="460" rx="36" fill="url(#grid)"/><circle cx="459" cy="123" r="78" fill="#fff7e9"/>
+<ellipse cx="310" cy="397" rx="246" ry="22" fill="#314d43" opacity=".09"/>
+<path d="M157 171C157 132 185 108 217 108s61 24 61 63" fill="none" stroke="#315145" stroke-width="15"/>
+<path d="M112 184Q113 162 141 160H304Q332 162 336 185L353 345Q355 371 328 374H108Q82 371 85 347Z" fill="url(#bag)" stroke="#426251" stroke-width="3"/>
+<path d="M110 188H332M211 164V371" stroke="#b5c7b4" stroke-width="3"/><rect x="106" y="236" width="90" height="104" rx="13" fill="#688471" stroke="#bdd0bd" stroke-width="2"/><path d="M119 253H183" stroke="#cbdbc8" stroke-width="4"/>
+<rect x="230" y="235" width="84" height="60" rx="12" fill="#b3c6af"/><path d="M254 258H291M273 249V268" stroke="#4e6a58" stroke-width="5" stroke-linecap="round"/>
+<path d="M351 233l76-9q13-1 15 12l10 97q1 14-13 15l-76 8q-14 1-16-12l-9-97q-1-12 13-14Z" fill="#e4b79b" stroke="#bc8a72" stroke-width="2"/><path d="M351 251l87-8" stroke="#fff0df" stroke-width="3"/><path d="M379 274c-15 8-11 23 4 27 10 3 19-4 14-16-4-10-14-18-18-11Z" fill="#fff1df"/>
+<path d="M443 269l73 8q12 2 10 15l-9 74q-2 12-15 11l-73-9q-13-2-11-14l9-73q2-13 16-12Z" fill="#f4eddb" stroke="#b7aa92" stroke-width="2"/><path d="M437 292l79 9" stroke="#a8bdb0" stroke-width="3"/>
+<path d="M449 320l8-7 12 5 11-3 11 11-5 7-7-5-4 26-20-3 4-23-7 3Z" fill="#b6c7b7"/>
+<rect x="415" y="153" width="41" height="88" rx="12" fill="#fffaf0" stroke="#a6b8aa" stroke-width="2"/><rect x="420" y="166" width="31" height="30" rx="4" fill="#d3dfce"/><path d="M427 149v-20h24" fill="none" stroke="#a6b8aa" stroke-width="6" stroke-linecap="round"/>
+<rect x="476" y="186" width="64" height="42" rx="8" fill="#f7dfbd" stroke="#c6a682" stroke-width="2"/><path d="M491 205h34" stroke="#ac8762" stroke-width="3"/>
+<g fill="#647e70"><circle cx="101" cy="102" r="5"/><circle cx="537" cy="91" r="6"/><path d="M497 124v18m-9-9h18" stroke="#b49369" stroke-width="2"/></g></svg>

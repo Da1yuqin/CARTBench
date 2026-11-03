@@ -1,0 +1,24 @@
+{
+  "agent": {
+    "base_url": "https://your-provider.example/v1",
+    "model": "MODEL_NAME",
+    "api_key_env": "CARTBENCH_AGENT_KEY",
+    "temperature": 0,
+    "max_tokens": 8192,
+    "extra_body": {}
+  },
+  "judge": {
+    "base_url": "https://your-provider.example/v1",
+    "model": "MODEL_NAME",
+    "api_key_env": "CARTBENCH_JUDGE_KEY",
+    "temperature": 0,
+    "max_tokens": 8192,
+    "extra_body": {}
+  },
+  "runtime": {
+    "requests_per_minute": 5,
+    "timeout": 300,
+    "max_retries": 2
+  },
+  "output_dir": "outputs"
+}

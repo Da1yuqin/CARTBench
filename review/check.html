@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CARTBench · Expert Review</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,sans-serif;color:#172d38;background:#f4f6f6;font-size:15px;line-height:1.55}*{box-sizing:border-box}body{margin:0}header{background:#fff;border-bottom:1px solid #d8e0e3;padding:22px max(24px,calc((100vw - 1400px)/2));display:flex;justify-content:space-between;align-items:center;gap:24px}header strong{font-size:23px;letter-spacing:-.5px}header p{margin:3px 0;color:#556771}nav{display:flex;gap:20px}a{color:#17717a;text-decoration:none}nav a[aria-current]{font-weight:700;border-bottom:2px solid}main{max-width:1400px;margin:24px auto;padding:0 24px}.summary{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:24px}.metric{background:#fff;border:1px solid #d8e0e3;padding:9px 16px;border-radius:6px}.metric strong{margin-right:5px}.layout{display:grid;grid-template-columns:285px minmax(0,1fr);gap:24px}aside{align-self:start;position:sticky;top:18px;background:#fff;border:1px solid #d8e0e3;border-radius:8px;padding:18px}label{font-weight:600;display:block}input,button,select{font:inherit}input{width:100%;padding:10px;border:1px solid #9eb1bb;border-radius:5px;margin:8px 0}button{background:#19747d;color:#fff;border:1px solid #19747d;border-radius:5px;padding:8px 13px;cursor:pointer}button:disabled{opacity:.5;cursor:wait}#case-list{max-height:calc(100vh - 280px);overflow:auto;display:grid;gap:7px}.case-button{background:#fff;color:#243e49;text-align:left;border-color:#d8e0e3;width:100%;padding:9px 11px}.case-button[aria-pressed=true]{background:#e9f4f3;border-color:#19747d}.case-button b{display:block}.case-button span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;color:#536872}#search-count{color:#627780;font-size:13px;margin:4px 0 12px}section{background:#fff;border:1px solid #d8e0e3;border-radius:8px;padding:24px;margin-bottom:20px}h1{font-size:26px;margin:0 0 8px}h2{font-size:20px;margin:0 0 14px}h3{font-size:16px;margin:0 0 8px}p{margin:8px 0}.muted{color:#627780;font-size:13px}.text{white-space:pre-wrap;overflow-wrap:anywhere}.message{border-left:3px solid #d8e0e3;padding:2px 16px;margin:18px 0}.message.user{border-color:#19747d}.role{font-weight:700;text-transform:capitalize}.document{border-top:1px solid #d8e0e3;padding:16px 0}.document:last-child{padding-bottom:0}details{margin:10px 0}summary{cursor:pointer;font-weight:600;color:#27545d}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f7f8;padding:12px;border-radius:5px;font-size:12px}code{font-family:ui-monospace,SFMono-Regular,monospace}.rubric{border-top:1px solid #d8e0e3;padding:17px 0}.rubric:first-of-type{border-top:0}.rubric-heading{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.badge{background:#edf3f4;color:#26515e;border-radius:4px;padding:2px 8px;font-size:12px}.field-name{font-size:12px;font-weight:700;color:#536872;margin-top:12px;text-transform:uppercase;letter-spacing:.3px}blockquote{margin:8px 0;border-left:2px solid #a5c9c9;padding:5px 14px;background:#f6fafa}.valid{color:#21664b}.error{color:#a13232}#validation{margin-left:auto;max-width:600px}.tabs{display:flex;gap:9px;margin-bottom:10px;flex-wrap:wrap}.tabs button{background:#fff;color:#294d56;border-color:#c3d1d7}.tabs button[aria-pressed=true]{background:#19747d;color:#fff}.empty{padding:20px;color:#627780}@media(max-width:800px){header{align-items:flex-start;flex-direction:column;padding:18px 20px}.layout{grid-template-columns:1fr}main{padding:0 16px}aside{position:static}#case-list{max-height:190px;grid-template-columns:repeat(2,minmax(0,1fr))}section{padding:18px}#validation{margin-left:0}}
+</style>
+</head>
+<body>
+<header><div><strong>CARTBench</strong><p>Explore dialogue, product evidence and case-specific criteria.</p></div><nav aria-label="Main navigation"><a href="../review/check.html" aria-current="page">Expert Review</a><a href="../examples/index.html">Examples</a><a href="../runner/run.html">Run evaluation →</a></nav></header>
+<main>
+<div class="summary"><span class="metric"><strong id="case-count">—</strong> cases</span><span class="metric"><strong id="rubric-count">—</strong> criteria</span><button id="validate" type="button">Validate dataset</button><span id="validation" role="status">Loading dataset…</span></div>
+<div id="local-open" hidden><label for="data-file">Open data/data.json</label><input id="data-file" type="file" accept="application/json,.json"><p class="muted">Select the data file to browse and validate it directly in this page.</p></div>
+<div class="layout"><aside><label for="search">Find a case</label><input id="search" type="search" placeholder="Case ID, request or product" autocomplete="off"><p id="search-count"></p><div id="case-list" aria-label="Cases"></div></aside><div id="detail"><section><p>Loading case data…</p></section></div></div>
+</main>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+let dataset = [], selectedId = '', activeTier = 'Core', localMode = false;
+function element(tag, text, className) { const node = document.createElement(tag); if (text !== undefined) node.textContent = text; if (className) node.className = className; return node; }
+function decode(message) { try { return JSON.parse(message.content); } catch (_) { return message.content; } }
+function current(caseData) { return decode(caseData.messages[caseData.messages.length - 1]); }
+function rubricTier(rubric) { return rubric.dimension === 'Safety' ? 'Safety' : rubric.evaluation_tier === 'enhancement' ? 'Excellence' : 'Core'; }
+function details(title, value) { const node = element('details'); node.append(element('summary', title), element('pre', typeof value === 'string' ? value : JSON.stringify(value, null, 2))); return node; }
+function field(parent, name, value) { if (value === undefined || value === null || value === '') return; parent.append(element('div', name, 'field-name'), element('div', typeof value === 'string' ? value : JSON.stringify(value, null, 2), 'text')); }
+function caseList() {
+  const search = $('search').value.trim().toLowerCase();
+  const filtered = dataset.filter(item => { const latest = current(item); return [item.query_id, latest.query, ...latest.documents.map(doc => doc.title)].join(' ').toLowerCase().includes(search); });
+  $('search-count').textContent = `${filtered.length} of ${dataset.length} cases`;
+  const list = $('case-list'); list.replaceChildren();
+  for (const item of filtered) { const button = element('button', undefined, 'case-button'); button.type = 'button'; button.setAttribute('aria-pressed', String(item.query_id === selectedId)); button.append(element('b', item.query_id), element('span', current(item).query)); button.addEventListener('click', () => selectCase(item.query_id)); list.append(button); }
+  if (!filtered.length) list.append(element('p', 'No matching cases.', 'empty'));
+}
+function showRubrics(item, container) {
+  const rubrics = item.rubrics.filter(rubric => rubricTier(rubric) === activeTier); container.replaceChildren();
+  if (!rubrics.length) container.append(element('p', 'This case has no criteria in this tier.', 'muted'));
+  for (const rubric of rubrics) {
+    const block = element('article', undefined, 'rubric'); const heading = element('div', undefined, 'rubric-heading'); heading.append(element('strong', rubric.rubric_id), element('span', rubric.dimension, 'badge')); if (rubric.core_capability) heading.append(element('span', rubric.core_capability, 'badge')); block.append(heading);
+    field(block, 'Criterion', rubric.criterion); field(block, 'Pass condition', rubric.pass_condition); field(block, 'Fail condition', rubric.fail_condition);
+    const evidence = element('details'); evidence.append(element('summary', 'Source evidence and applicability'));
+    for (const span of rubric.source_spans) { evidence.append(element('p', span.source === 'documents' ? `Product ${span.doc_id}` : span.source, 'muted'), element('blockquote', span.quote, 'text')); }
+    field(evidence, 'Applicability', rubric.applicability); field(evidence, 'Unresolved condition', rubric.unresolved_condition); field(evidence, 'Acceptable alternatives', rubric.acceptable_alternatives); field(evidence, 'Bound input SHA-256', rubric.bound_input_sha256); block.append(evidence); container.append(block);
+  }
+}
+function selectCase(caseId) {
+  selectedId = caseId; const item = dataset.find(value => value.query_id === caseId); const latest = current(item); const view = $('detail'); view.replaceChildren();
+  const intro = element('section'); intro.append(element('h1', `Case ${item.query_id}`), element('p', latest.query, 'text'), element('p', `Current request: ${latest.timestamp}`, 'muted'), details('Input SHA-256 and user profile', { input_sha256: item.input_sha256, user_profile: latest.user_profile })); view.append(intro);
+  const conversation = element('section'); conversation.append(element('h2', 'Dialogue context'));
+  item.messages.forEach((message, index) => { if (index === item.messages.length - 1) return; if (message.role === 'system') { conversation.append(details('Agent system instruction', message.content)); return; } const value = decode(message); const block = element('div', undefined, `message ${message.role}`); block.append(element('div', message.role, 'role')); if (typeof value === 'object' && value !== null) { if (value.timestamp) block.append(element('div', value.timestamp, 'muted')); block.append(element('div', value.content || value.query || JSON.stringify(value, null, 2), 'text')); } else block.append(element('div', value, 'text')); conversation.append(block); });
+  const request = element('div', undefined, 'message user'); request.append(element('div', 'Current user request', 'role'), element('div', latest.timestamp, 'muted'), element('div', latest.query, 'text')); conversation.append(request); view.append(conversation);
+  const products = element('section'); products.append(element('h2', `Product evidence · ${latest.documents.length} records`));
+  for (const doc of latest.documents) { const block = element('article', undefined, 'document'); block.append(element('h3', doc.title), element('p', doc.doc_id, 'muted'), element('div', doc.content, 'text')); products.append(block); } view.append(products);
+  const criteria = element('section'); criteria.append(element('h2', `Evaluation criteria · ${item.rubrics.length}`)); const tabs = element('div', undefined, 'tabs'); const body = element('div');
+  for (const name of ['Core', 'Excellence', 'Safety']) { const count = item.rubrics.filter(rubric => rubricTier(rubric) === name).length; const button = element('button', `${name} (${count})`); button.type = 'button'; button.setAttribute('aria-pressed', String(activeTier === name)); button.addEventListener('click', () => { activeTier = name; for (const other of tabs.children) other.setAttribute('aria-pressed', String(other === button)); showRubrics(item, body); }); tabs.append(button); }
+  criteria.append(tabs, body); showRubrics(item, body); view.append(criteria); caseList();
+}
+async function validate() {
+  $('validate').disabled = true; $('validation').className = ''; $('validation').textContent = 'Checking schema, counts, hashes and verbatim evidence…';
+  try { let result; if (localMode) result = {valid:true, summary:await validateLocal()}; else { const response = await fetch('../api/validate'); result = await response.json(); } if (!result.valid) throw new Error(result.error); $('validation').className = 'valid'; $('validation').textContent = `Validated · ${result.summary.tiers.Core} Core / ${result.summary.tiers.Excellence} Excellence / ${result.summary.tiers.Safety} Safety`; }
+  catch (error) { $('validation').className = 'error'; $('validation').textContent = error.message; }
+  finally { $('validate').disabled = false; }
+}
+$('search').addEventListener('input', caseList); $('validate').addEventListener('click', validate);
+function canonical(value) { if (Array.isArray(value)) return '[' + value.map(canonical).join(',') + ']'; if (value && typeof value === 'object') return '{' + Object.keys(value).sort().map(key => JSON.stringify(key) + ':' + canonical(value[key])).join(',') + '}'; return JSON.stringify(value); }
+async function fingerprint(value) { const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(canonical(value))); return Array.from(new Uint8Array(bytes)).map(byte => byte.toString(16).padStart(2,'0')).join(''); }
+async function validateLocal() {
+  if (!Array.isArray(dataset) || dataset.length !== 169) throw new Error('Expected all 169 cases.');
+  const ids = new Set(), rubricIds = new Set(), tiers = {Core:0,Excellence:0,Safety:0}, capabilities = {GA:0,RA:0,UP:0,EF:0,PV:0,DS:0};
+  for (const item of dataset) {
+    if (Object.keys(item).sort().join(',')!=='input_sha256,messages,query_id,rubrics' || typeof item.query_id!=='string') throw new Error('Invalid case schema.'); if (ids.has(item.query_id)) throw new Error('Duplicate case identifier.'); ids.add(item.query_id);
+    if (!Array.isArray(item.messages) || item.messages[0].role !== 'system' || item.messages[item.messages.length-1].role !== 'user') throw new Error('Invalid message positions.');
+    if (item.messages.some(message=>Object.keys(message).sort().join(',')!=='content,role' || typeof message.content!=='string' || !['system','user','assistant'].includes(message.role))) throw new Error('Invalid message schema.'); if (await fingerprint(item.messages) !== item.input_sha256) throw new Error(`Input hash mismatch: ${item.query_id}`);
+    const latest = current(item); if (!latest || !Array.isArray(latest.documents)) throw new Error('Missing product records.');
+    if (latest.documents.some(doc=>['doc_id','title','content'].some(key=>typeof doc[key]!=='string'))) throw new Error('Invalid product schema.'); if (new Set(latest.documents.map(doc=>doc.doc_id)).size !== latest.documents.length) throw new Error('Duplicate product identifier.');
+    for (const rubric of item.rubrics) {
+      if (typeof rubric.rubric_id!=='string' || !['core','enhancement'].includes(rubric.evaluation_tier || 'core') || !rubric.applicability || typeof rubric.applicability!=='object') throw new Error('Invalid rubric schema.'); if (rubricIds.has(rubric.rubric_id)) throw new Error('Duplicate rubric identifier.'); rubricIds.add(rubric.rubric_id);
+      if (rubric.bound_input_sha256 !== item.input_sha256) throw new Error('Rubric binding mismatch.');
+      const tier = rubricTier(rubric); tiers[tier]++; if(tier!=='Core' && 'core_capability' in rubric) throw new Error('Only Core criteria may carry Core capabilities.'); if (tier==='Core') { if (!(rubric.core_capability in capabilities)) throw new Error('Missing Core capability.'); capabilities[rubric.core_capability]++; }
+      for (const key of ['criterion','pass_condition','fail_condition']) if (typeof rubric[key]!=='string' || !rubric[key]) throw new Error('Missing rubric condition.');
+      if (!rubric.source_spans || !rubric.source_spans.length) throw new Error('Missing source evidence.');
+      for (const span of rubric.source_spans) {
+        let source;
+        if (span.source==='documents') { const doc=latest.documents.find(value=>value.doc_id===span.doc_id); source=doc && doc.content; }
+        else { const match=/^messages\[(\d+)\]\.(content|query|timestamp)$/.exec(span.source || ''); if (!match || +match[1]>=item.messages.length) throw new Error('Invalid evidence reference.'); const message=decode(item.messages[+match[1]]); source=typeof message==='object' && message ? message[match[2]] : match[2]==='content' ? message : undefined; if (span.timestamp && span.timestamp!==message.timestamp) throw new Error('Evidence timestamp mismatch.'); }
+        if (typeof source!=='string' || typeof span.quote!=='string' || !span.quote || !source.includes(span.quote)) throw new Error(`Evidence quote mismatch: ${rubric.rubric_id}`);
+      }
+    }
+  }
+  if (tiers.Core!==760 || tiers.Excellence!==553 || tiers.Safety!==15) throw new Error('Rubric count mismatch.');
+  const expected={GA:127,RA:166,UP:72,EF:186,PV:139,DS:70}; for (const key of Object.keys(expected)) if(capabilities[key]!==expected[key]) throw new Error('Core capability count mismatch.');
+  return {tiers};
+}
+async function loadData(data) { dataset=data; if (!Array.isArray(dataset) || !dataset.length) throw new Error('Select the benchmark data JSON.'); $('case-count').textContent=dataset.length; $('rubric-count').textContent=dataset.reduce((count,item)=>count+item.rubrics.length,0).toLocaleString('en-US'); selectCase(dataset[0].query_id); await validate(); }
+$('data-file').addEventListener('change', async event=>{ try { const file=event.target.files[0]; if(!file)return; localMode=true; await loadData(JSON.parse(await file.text())); } catch(error){$('validation').className='error';$('validation').textContent=error.message;} });
+(async () => { if(location.protocol==='file:'){ localMode=true;$('local-open').hidden=false;$('validation').textContent='Open data/data.json to begin.';return; } try { const response=await fetch('../api/data'); if (!response.ok) { localMode=true; const staticResponse=await fetch('../data/data.json'); if(!staticResponse.ok)throw new Error('Open data/data.json or start python3 run.py --serve.'); await loadData(await staticResponse.json()); } else await loadData(await response.json()); } catch(error){localMode=true;$('local-open').hidden=false;$('validation').className='error';$('validation').textContent=error.message;} })();
+</script>
+</body>
+</html>

@@ -2,6 +2,8 @@
 
 **Explore:** [Review the data](review/check.html) · [Run an evaluation](runner/run.html) · [Output examples](examples/index.html)
 
+**Resources:** [Paper](https://arxiv.org/abs/2611.05862) · [HF Papers](https://huggingface.co/papers/2611.05862) · [Hugging Face Dataset](https://huggingface.co/datasets/dayll/CARTBench)
+
 Open Review directly and select `data/data.json`, or start both interactive pages with `python3 run.py --serve`. The Run page links to the local evaluation interface; saved examples can be opened directly.
 
 CARTBench evaluates shopping advice for **Complex and Ambiguous Requests with Timelines**. It connects timestamped shopping dialogue and supplied product evidence to case-specific checks of required behavior, additional decision help, and safety.
@@ -108,6 +110,15 @@ Each new evaluation saves `outputs/<query_id>.json` and a standalone `outputs/<q
 ## Data and Evaluation
 
 [`data/data.json`](data/data.json) contains 169 cases across 17 retail domains, 1,603 product records, and all 1,328 criteria. Each case includes `query_id`, `messages`, `input_sha256`, and `rubrics`. Case identifiers, timestamps, numeric values, and null profiles are preserved. Evidence quotations refer to the supplied source text, and input hashes bind each rubric to the messages actually supplied to the model.
+
+The same public data is available on [Hugging Face](https://huggingface.co/datasets/dayll/CARTBench). Load all 169 evaluation cases with the optional `datasets` library:
+
+```python
+from datasets import load_dataset
+
+dataset = load_dataset("dayll/CARTBench")
+case = dataset["test"][0]
+```
 
 [`prompt/agent.md`](prompt/agent.md) implements Principle-Guided CART Prompting. [`prompt/judge.md`](prompt/judge.md) contains the judging instruction and complete runtime contract. Product information comes from an internal product search platform and is supplied with each case.
 
